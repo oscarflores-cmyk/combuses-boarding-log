@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f1a">
+<title>Combuses — Boarding Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2235;
+    --bg-input: #0d1525;
+    --border: #1e2a3a;
+    --border-focus: #3b82f6;
+    --text: #e8ecf4;
+    --text-muted: #6b7a90;
+    --text-dim: #4a5568;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --success: #10b981;
+    --success-glow: rgba(16, 185, 129, 0.15);
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Top Bar ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 15, 26, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), #6366f1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: white;
+  }
+  .topbar h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .topbar h1 span { color: var(--text-muted); font-weight: 300; }
+
+  /* ── Nav Tabs ── */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px 20px 12px;
+    background: rgba(10, 15, 26, 0.85);
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 61px;
+    z-index: 99;
+  }
+  .nav-tab {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .nav-tab.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .nav-tab svg { width: 16px; height: 16px; }
+
+  /* ── Sections ── */
+  .section { display: none; padding: 16px 20px 100px; }
+  .section.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+
+  /* ── Form Elements ── */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  select, input[type="text"], input[type="number"], input[type="time"], input[type="date"], textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  select { cursor: pointer; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .form-group { margin-bottom: 14px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+  .btn-success:active { transform: scale(0.98); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+  }
+  .btn-sm {
+    padding: 8px 14px;
+    font-size: 13px;
+    width: auto;
+  }
+
+  /* ── Scanner ── */
+  .scanner-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 320px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 14px;
+  }
+  .scanner-container video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .scanner-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .scanner-frame {
+    width: 200px; height: 200px;
+    border: 2px solid rgba(59, 130, 246, 0.6);
+    border-radius: 16px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .scanner-frame::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: 50%;
+    width: 60%;
+    height: 2px;
+    background: var(--accent);
+    transform: translateX(-50%);
+    animation: scanline 2s ease-in-out infinite;
+    box-shadow: 0 0 12px var(--accent);
+  }
+  @keyframes scanline {
+    0%, 100% { top: -2px; }
+    50% { top: calc(100% + 2px); }
+  }
+  .scanner-status {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 8px 0;
+  }
+
+  /* ── Scanned Result ── */
+  .scan-result {
+    background: var(--success-glow);
+    border: 1px solid var(--success);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .scan-result.show { display: block; }
+  .scan-result .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--success);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .scan-result .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    word-break: break-all;
+  }
+
+  /* ── Log Entry ── */
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-entry-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--accent-glow);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .log-entry-icon svg { width: 18px; height: 18px; color: var(--accent); }
+  .log-entry-info { flex: 1; min-width: 0; }
+  .log-entry-ticket {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .log-entry-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .log-entry-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  /* ── Boarding counter ── */
+  .boarding-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    margin-bottom: 14px;
+  }
+  .boarding-counter .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .boarding-counter .count-label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* ── Bus List ── */
+  .bus-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    background: var(--bg-input);
+  }
+  .bus-item-info {
+    font-size: 14px;
+  }
+  .bus-item-info .bus-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .bus-item-info .bus-route {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .bus-item-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-icon:active { transform: scale(0.9); }
+  .btn-icon svg { width: 14px; height: 14px; }
+  .btn-icon.delete { border-color: var(--danger); color: var(--danger); }
+
+  /* ── Config / Sheets ── */
+  .sheets-url-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 10px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    word-break: break-all;
+    border: 1px solid var(--border);
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .status-badge.connected { background: var(--success-glow); color: var(--success); }
+  .status-badge.disconnected { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .modal-actions .btn { flex: 1; }
+
+  /* ── Helpers ── */
+  .mb-8 { margin-bottom: 8px; }
+  .mb-12 { margin-bottom: 12px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mt-12 { margin-top: 12px; }
+  .text-center { text-align: center; }
+  .text-muted { color: var(--text-muted); }
+  .text-sm { font-size: 13px; }
+  .hidden { display: none !important; }
+
+  .info-box {
+    background: var(--accent-glow);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .info-box strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">CB</div>
+    <h1>Combuses <span>Boarding</span></h1>
+  </div>
+  <div id="sheetsStatus">
+    <span class="status-badge disconnected"><span class="status-dot"></span> Offline</span>
+  </div>
+</header>
+
+<!-- ── Nav ── -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" data-section="scan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+    Scan
+  </button>
+  <button class="nav-tab" data-section="log">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Log
+  </button>
+  <button class="nav-tab" data-section="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ══════════════════════════ SCAN Section ══════════════════════════ -->
+<section id="sec-scan" class="section active">
+
+  <!-- Active Bus Selection -->
+  <div class="card">
+    <div class="card-title">Active Bus</div>
+    <div class="form-group" style="margin-bottom:0">
+      <select id="activeBus">
+        <option value="">— Select a bus —</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Scanner -->
+  <div class="card" id="scannerCard">
+    <div class="card-title">Scan Ticket QR</div>
+    <div class="scanner-container" id="scannerContainer">
+      <video id="scannerVideo" autoplay playsinline></video>
+      <div class="scanner-overlay">
+        <div class="scanner-frame"></div>
+      </div>
+    </div>
+    <div class="scanner-status" id="scannerStatus">Tap below to start camera</div>
+    <button class="btn btn-primary" id="toggleScannerBtn" onclick="toggleScanner()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Start Camera
+    </button>
+
+    <div class="scan-result" id="scanResult">
+      <div class="label">QR Content Detected</div>
+      <div class="value" id="scanResultValue"></div>
+    </div>
+  </div>
+
+  <!-- Manual Entry -->
+  <div class="card">
+    <div class="card-title">Or Enter Manually</div>
+    <div class="form-group">
+      <label>Ticket / Booking ID</label>
+      <input type="text" id="manualTicket" placeholder="e.g. TKT-00123 or scan result">
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <label>Notes (optional)</label>
+      <input type="text" id="boardingNotes" placeholder="e.g. wheelchair, child, extra luggage">
+    </div>
+  </div>
+
+  <!-- Board Button -->
+  <button class="btn btn-success" onclick="registerBoarding()" style="margin-bottom:12px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    Register Boarding
+  </button>
+
+  <!-- Counter -->
+  <div class="boarding-counter">
+    <div>
+      <div class="count" id="boardingCount">0</div>
+      <div class="count-label">boarded on this bus</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ LOG Section ══════════════════════════ -->
+<section id="sec-log" class="section">
+  <div class="card">
+    <div class="card-title">Today's Boarding Log</div>
+    <div class="form-row mb-12">
+      <div class="form-group" style="margin-bottom:0">
+        <label>Filter by Bus</label>
+        <select id="logFilterBus">
+          <option value="">All buses</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Date</label>
+        <input type="date" id="logFilterDate">
+      </div>
+    </div>
+    <div id="logEntries">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No boarding records yet.<br>Start scanning to see entries here.</p>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-outline" onclick="exportCSV()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Export CSV
+  </button>
+</section>
+
+<!-- ══════════════════════════ SETTINGS Section ══════════════════════════ -->
+<section id="sec-settings" class="section">
+
+  <!-- Google Sheets Config -->
+  <div class="card">
+    <div class="card-title">Google Sheets Integration</div>
+    <div class="info-box">
+      <strong>How it works:</strong> Create a Google Apps Script web app that receives data via POST. Paste the URL below and all boardings will be logged to your sheet automatically.
+      <br><br>
+      <strong>Setup guide</strong> is included in the documentation.
+    </div>
+    <div class="form-group">
+      <label>Apps Script Web App URL</label>
+      <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/...">
+    </div>
+    <button class="btn btn-primary" onclick="saveSheetUrl()">Save & Test Connection</button>
+  </div>
+
+  <!-- Bus Management -->
+  <div class="card">
+    <div class="card-title">Bus Fleet</div>
+    <div id="busListSettings"></div>
+    <button class="btn btn-outline mt-12" onclick="showAddBusModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Bus
+    </button>
+  </div>
+
+  <!-- Data -->
+  <div class="card">
+    <div class="card-title">Data Management</div>
+    <button class="btn btn-outline mb-8" onclick="exportAllData()">Export All Data (JSON)</button>
+    <button class="btn btn-danger" onclick="confirmClear()">Clear All Boarding Records</button>
+  </div>
+</section>
+
+<!-- ══════════════════ Add/Edit Bus Modal ══════════════════ -->
+<div class="modal-backdrop" id="busModal">
+  <div class="modal">
+    <h3 id="busModalTitle">Add Bus</h3>
+    <div class="form-group">
+      <label>Bus ID / Number</label>
+      <input type="text" id="busIdInput" placeholder="e.g. BUS-101 or plate ABC-1234">
+    </div>
+    <div class="form-group">
+      <label>Route / OD</label>
+      <input type="text" id="busRouteInput" placeholder="e.g. AICM → Puebla">
+    </div>
+    <div class="form-group">
+      <label>Departure Time (optional)</label>
+      <input type="time" id="busDepartureInput">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeBusModal()">Cancel</button>
+      <button class="btn btn-primary" id="busModalSave" onclick="saveBus()">Add Bus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════ Scripts ══════════════════ -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+// ── State ──
+let state = {
+  buses: [],
+  boardings: [],
+  sheetsUrl: '',
+  activeBusId: '',
+  scannerActive: false,
+};
+
+let html5QrCode = null;
+let editingBusIndex = -1;
+
+// ── Init ──
+function init() {
+  loadState();
+  renderBusSelectors();
+  renderBusListSettings();
+  renderLog();
+  updateBoardingCount();
+  updateSheetsStatus();
+
+  // Set today's date for log filter
+  document.getElementById('logFilterDate').value = todayStr();
+
+  // Nav tabs
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('sec-' + tab.dataset.section).classList.add('active');
+      // Stop scanner when leaving scan tab
+      if (tab.dataset.section !== 'scan' && state.scannerActive) {
+        stopScanner();
+      }
+    });
+  });
+
+  // Filter listeners
+  document.getElementById('logFilterBus').addEventListener('change', renderLog);
+  document.getElementById('logFilterDate').addEventListener('change', renderLog);
+
+  // Active bus change
+  document.getElementById('activeBus').addEventListener('change', (e) => {
+    state.activeBusId = e.target.value;
+    saveState();
+    updateBoardingCount();
+  });
+
+  // Load sheets URL
+  document.getElementById('sheetsUrl').value = state.sheetsUrl || '';
+}
+
+// ── Persistence ──
+function loadState() {
+  try {
+    const saved = localStorage.getItem('combuses_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    }
+    // Default buses if empty
+    if (!state.buses.length) {
+      state.buses = [
+        { id: 'BUS-101', route: 'AICM T1 → Puebla', departure: '08:00' },
+        { id: 'BUS-102', route: 'AICM T2 → Puebla', departure: '10:00' },
+        { id: 'BUS-201', route: 'AICM T1 → Cuernavaca', departure: '09:00' },
+      ];
+      saveState();
+    }
+  } catch(e) { console.error('Load state error', e); }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('combuses_state', JSON.stringify(state));
+  } catch(e) { console.error('Save state error', e); }
+}
+
+// ── Bus Management ──
+function renderBusSelectors() {
+  const opts = state.buses.map(b =>
+    `<option value="${b.id}" ${b.id === state.activeBusId ? 'selected' : ''}>${b.id} — ${b.route}${b.departure ? ' @ ' + b.departure : ''}</option>`
+  ).join('');
+  const empty = '<option value="">— Select a bus —</option>';
+  document.getElementById('activeBus').innerHTML = empty + opts;
+  document.getElementById('logFilterBus').innerHTML = '<option value="">All buses</option>' + opts;
+}
+
+function renderBusListSettings() {
+  const container = document.getElementById('busListSettings');
+  if (!state.buses.length) {
+    container.innerHTML = '<div class="empty-state"><p>No buses configured.</p></div>';
+    return;
+  }
+  container.innerHTML = state.buses.map((b, i) => `
+    <div class="bus-item">
+      <div class="bus-item-info">
+        <div class="bus-id">${b.id}</div>
+        <div class="bus-route">${b.route}${b.departure ? ' @ ' + b.departure : ''}</div>
+      </div>
+      <div class="bus-item-actions">
+        <button class="btn-icon" onclick="editBus(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon delete" onclick="deleteBus(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showAddBusModal() {
+  editingBusIndex = -1;
+  document.getElementById('busModalTitle').textContent = 'Add Bus';
+  document.getElementById('busModalSave').textContent = 'Add Bus';
+  document.getElementById('busIdInput').value = '';
+  document.getElementById('busRouteInput').value = '';
+  document.getElementById('busDepartureInput').value = '';
+  document.getElementById('busModal').classList.add('show');
+}
+
+function editBus(i) {
+  editingBusIndex = i;
+  const bus = state.buses[i];
+  document.getElementById('busModalTitle').textContent = 'Edit Bus';
+  document.getElementById('busModalSave').textContent = 'Save Changes';
+  document.getElementById('busIdInput').value = bus.id;
+  document.getElementById('busRouteInput').value = bus.route;
+  document.getElementById('busDepartureInput').value = bus.departure || '';
+  document.getElementById('busModal').classList.add('show');
+}
+
+function closeBusModal() {
+  document.getElementById('busModal').classList.remove('show');
+}
+
+function saveBus() {
+  const id = document.getElementById('busIdInput').value.trim();
+  const route = document.getElementById('busRouteInput').value.trim();
+  const departure = document.getElementById('busDepartureInput').value;
+
+  if (!id || !route) {
+    toast('Please enter bus ID and route', 'error');
+    return;
+  }
+
+  if (editingBusIndex >= 0) {
+    state.buses[editingBusIndex] = { id, route, departure };
+    toast('Bus updated', 'success');
+  } else {
+    state.buses.push({ id, route, departure });
+    toast('Bus added', 'success');
+  }
+  saveState();
+  renderBusSelectors();
+  renderBusListSettings();
+  closeBusModal();
+}
+
+function deleteBus(i) {
+  if (confirm(`Delete ${state.buses[i].id}?`)) {
+    state.buses.splice(i, 1);
+    saveState();
+    renderBusSelectors();
+    renderBusListSettings();
+    toast('Bus removed', 'success');
+  }
+}
+
+// ── QR Scanner ──
+function toggleScanner() {
+  if (state.scannerActive) {
+    stopScanner();
+  } else {
+    startScanner();
+  }
+}
+
+function startScanner() {
+  const container = document.getElementById('scannerContainer');
+  const btn = document.getElementById('toggleScannerBtn');
+  const status = document.getElementById('scannerStatus');
+
+  if (!html5QrCode) {
+    html5QrCode = new Html5Qrcode("scannerContainer", { verbose: false });
+  }
+
+  // Clear the scanner container and re-add video overlay
+  status.textContent = 'Starting camera...';
+
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1.0 },
+    onScanSuccess,
+    () => {} // ignore scan failures
+  ).then(() => {
+    state.scannerActive = true;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg> Stop Camera`;
+    status.textContent = 'Point at QR code on ticket';
+  }).catch(err => {
+    status.textContent = 'Camera error: ' + err;
+    console.error(err);
+  });
+}
+
+function stopScanner() {
+  const btn = document.getElementById('toggleScannerBtn');
+  const status = document.getElementById('scannerStatus');
+
+  if (html5QrCode && state.scannerActive) {
+    html5QrCode.stop().then(() => {
+      state.scannerActive = false;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Start Camera`;
+      status.textContent = 'Camera stopped';
+    }).catch(err => console.error(err));
+  }
+}
+
+function onScanSuccess(decodedText) {
+  // Vibrate if available
+  if (navigator.vibrate) navigator.vibrate(100);
+
+  // Show result
+  document.getElementById('scanResult').classList.add('show');
+  document.getElementById('scanResultValue').textContent = decodedText;
+
+  // Auto-fill manual field
+  document.getElementById('manualTicket').value = decodedText;
+
+  // Brief pause to avoid double-scan
+  if (html5QrCode && state.scannerActive) {
+    html5QrCode.pause(true);
+    setTimeout(() => {
+      if (html5QrCode && state.scannerActive) {
+        try { html5QrCode.resume(); } catch(e) {}
+      }
+    }, 2000);
+  }
+
+  toast('QR scanned ✓', 'success');
+}
+
+// ── Boarding Registration ──
+function registerBoarding() {
+  const busId = document.getElementById('activeBus').value;
+  const ticket = document.getElementById('manualTicket').value.trim();
+  const notes = document.getElementById('boardingNotes').value.trim();
+
+  if (!busId) {
+    toast('Select a bus first', 'error');
+    return;
+  }
+  if (!ticket) {
+    toast('Scan or enter a ticket number', 'error');
+    return;
+  }
+
+  const bus = state.buses.find(b => b.id === busId);
+  const record = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    ticket,
+    busId,
+    busRoute: bus ? bus.route : '',
+    busDeparture: bus ? bus.departure : '',
+    notes,
+    timestamp: new Date().toISOString(),
+    date: todayStr(),
+  };
+
+  state.boardings.unshift(record);
+  saveState();
+
+  // Clear inputs
+  document.getElementById('manualTicket').value = '';
+  document.getElementById('boardingNotes').value = '';
+  document.getElementById('scanResult').classList.remove('show');
+
+  updateBoardingCount();
+  renderLog();
+  sendToSheets(record);
+
+  toast(`Boarded: ${ticket} → ${busId}`, 'success');
+}
+
+function updateBoardingCount() {
+  const busId = state.activeBusId;
+  const today = todayStr();
+  const count = state.boardings.filter(b => b.busId === busId && b.date === today).length;
+  document.getElementById('boardingCount').textContent = count;
+}
+
+// ── Log Rendering ──
+function renderLog() {
+  const container = document.getElementById('logEntries');
+  const filterBus = document.getElementById('logFilterBus').value;
+  const filterDate = document.getElementById('logFilterDate').value || todayStr();
+
+  let entries = state.boardings.filter(b => {
+    if (filterBus && b.busId !== filterBus) return false;
+    if (filterDate && b.date !== filterDate) return false;
+    return true;
+  });
+
+  if (!entries.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No records for this filter.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = entries.map(b => {
+    const t = new Date(b.timestamp);
+    const time = t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="log-entry">
+        <div class="log-entry-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+        </div>
+        <div class="log-entry-info">
+          <div class="log-entry-ticket">${b.ticket}</div>
+          <div class="log-entry-meta">${b.busId} — ${b.busRoute}${b.notes ? ' · ' + b.notes : ''}</div>
+        </div>
+        <div class="log-entry-time">${time}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Google Sheets ──
+function saveSheetUrl() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  state.sheetsUrl = url;
+  saveState();
+
+  if (!url) {
+    updateSheetsStatus(false);
+    toast('Sheets URL cleared', 'success');
+    return;
+  }
+
+  // Test connection
+  toast('Testing connection...', 'success');
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ test: true, timestamp: new Date().toISOString() })
+  }).then(() => {
+    updateSheetsStatus(true);
+    toast('Connection saved (test sent)', 'success');
+  }).catch(err => {
+    updateSheetsStatus(false);
+    toast('Connection error: ' + err.message, 'error');
+  });
+}
+
+function sendToSheets(record) {
+  if (!state.sheetsUrl) return;
+  fetch(state.sheetsUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(record)
+  }).catch(err => console.error('Sheets sync error:', err));
+}
+
+function updateSheetsStatus(connected) {
+  const el = document.getElementById('sheetsStatus');
+  if (connected === undefined) {
+    connected = !!state.sheetsUrl;
+  }
+  el.innerHTML = connected
+    ? '<span class="status-badge connected"><span class="status-dot"></span> Synced</span>'
+    : '<span class="status-badge disconnected"><span class="status-dot"></span> Offline</span>';
+}
+
+// ── Export ──
+function exportCSV() {
+  const filterBus = document.getElementById('logFilterBus').value;
+  const filterDate = document.getElementById('logFilterDate').value || todayStr();
+
+  let entries = state.boardings.filter(b => {
+    if (filterBus && b.busId !== filterBus) return false;
+    if (filterDate && b.date !== filterDate) return false;
+    return true;
+  });
+
+  if (!entries.length) {
+    toast('No records to export', 'error');
+    return;
+  }
+
+  const headers = ['Date', 'Time', 'Ticket', 'Bus ID', 'Route', 'Departure', 'Notes'];
+  const rows = entries.map(b => {
+    const t = new Date(b.timestamp);
+    return [
+      b.date,
+      t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      b.ticket,
+      b.busId,
+      b.busRoute,
+      b.busDeparture || '',
+      b.notes || ''
+    ].map(v => `"${v}"`).join(',');
+  });
+
+  const csv = [headers.join(','), ...rows].join('\n');
+  downloadFile(csv, `combuses-boarding-${filterDate}.csv`, 'text/csv');
+  toast('CSV exported', 'success');
+}
+
+function exportAllData() {
+  const json = JSON.stringify(state, null, 2);
+  downloadFile(json, `combuses-data-${todayStr()}.json`, 'application/json');
+  toast('Data exported', 'success');
+}
+
+function confirmClear() {
+  if (confirm('This will delete ALL boarding records. Are you sure?')) {
+    if (confirm('Really? This cannot be undone.')) {
+      state.boardings = [];
+      saveState();
+      renderLog();
+      updateBoardingCount();
+      toast('All records cleared', 'success');
+    }
+  }
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Helpers ──
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Click outside modal to close ──
+document.getElementById('busModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('busModal')) closeBusModal();
+});
+
+// Boot
+init();
+</script>
+</body>
+</html>
